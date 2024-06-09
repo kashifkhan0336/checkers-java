@@ -1,12 +1,10 @@
 
+import gui.App;
 
 
-/**
- *
- * @author fawad
- */
 public class Main {
+    
     public static void main(String[] args) {
-        System.out.println("Hello");
+        new App().start();
     }
 }

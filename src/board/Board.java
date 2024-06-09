@@ -56,8 +56,8 @@ public class Board {
         return this.board;
     }
     
-    public Tile getTile(Coordinates coordinates) {
-        return board[coordinates.row][coordinates.col];
+    public Tile getTile(int row, int col) {
+        return board[row][col];
     }
     
     public void updateBoard(Move move) {
@@ -65,6 +65,6 @@ public class Board {
         Coordinates from = move.fromTileCoordinates;
         
         board[from.row][from.col] = new Tile(Colors.BLACK, from, null);
-        board[to.row][to.col] = new Tile(Colors.BLACK, to, this.getTile(from).getPiece());
+        board[to.row][to.col] = new Tile(Colors.BLACK, to, this.getTile(from.row, from.col).getPiece());
     }
 }
