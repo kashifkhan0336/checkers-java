@@ -4,6 +4,7 @@
  */
 package board;
 
+import pieces.Move;
 import tiles.Colors;
 import pieces.Piece;
 import pieces.RegularPiece;
@@ -53,5 +54,17 @@ public class Board {
     
     public Tile[][] getBoard() {
         return this.board;
+    }
+    
+    public Tile getTile(Coordinates coordinates) {
+        return board[coordinates.row][coordinates.col];
+    }
+    
+    public void updateBoard(Move move) {
+        Coordinates to = move.toTileCoordinates;
+        Coordinates from = move.fromTileCoordinates;
+        
+        board[from.row][from.col] = new Tile(Colors.BLACK, from, null);
+        board[to.row][to.col] = new Tile(Colors.BLACK, to, this.getTile(from).getPiece());
     }
 }
