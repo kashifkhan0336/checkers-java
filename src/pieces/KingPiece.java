@@ -17,25 +17,25 @@ public class KingPiece extends Piece {
     public KingPiece(Coordinates coordinates, Team team) {
         super(coordinates, team);
     }
-    
+
     @Override
-    protected ArrayList<Coordinates> getDiagonalTiles() {
+    protected ArrayList<Coordinates> getDiagonalTiles(Coordinates initialCoordinates) {
         ArrayList<Coordinates> diagonals = new ArrayList();
 
-            // Get diagonals for king piece
-            int frow = this.coordinates.row - 1;
-            int srow = this.coordinates.row + 1;
-            int fcol = this.coordinates.col - 1;
-            int scol = this.coordinates.col + 1;
+        // Get diagonals for king piece
+        int frow = this.coordinates.row - 1;
+        int srow = this.coordinates.row + 1;
+        int fcol = this.coordinates.col - 1;
+        int scol = this.coordinates.col + 1;
 
-            Coordinates diagonal1 = new Coordinates(frow, fcol);
-            Coordinates diagonal2 = new Coordinates(frow, scol);
-            Coordinates diagonal3 = new Coordinates(srow, fcol);
-            Coordinates diagonal4 = new Coordinates(srow, scol);
-            diagonals.add(diagonal1);
-            diagonals.add(diagonal2);
-            diagonals.add(diagonal3);
-            diagonals.add(diagonal4);
+        Coordinates diagonal1 = new Coordinates(frow, fcol);
+        Coordinates diagonal2 = new Coordinates(frow, scol);
+        Coordinates diagonal3 = new Coordinates(srow, fcol);
+        Coordinates diagonal4 = new Coordinates(srow, scol);
+        diagonals.add(diagonal1);
+        diagonals.add(diagonal2);
+        diagonals.add(diagonal3);
+        diagonals.add(diagonal4);
 
         return diagonals;
     }
@@ -70,7 +70,10 @@ public class KingPiece extends Piece {
 
     @Override
     public void calculateLegalMoves(Tile[][] board, Coordinates initialPosition, boolean checkEmpty) {
-        ArrayList<Coordinates> diagonals = this.getDiagonalTiles();
+        // Clear previously stored legalMoves
+        this.legalMoves.clear();
+        
+        ArrayList<Coordinates> diagonals = this.getDiagonalTiles(initialPosition);
         System.out.println(diagonals);
 
         for (Coordinates diagonal : diagonals) {
@@ -119,5 +122,5 @@ public class KingPiece extends Piece {
             }
         }
     }
-    
+
 }

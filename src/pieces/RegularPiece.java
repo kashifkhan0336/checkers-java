@@ -4,6 +4,7 @@
  */
 package pieces;
 
+import board.Board;
 import board.Coordinates;
 import java.util.ArrayList;
 import tiles.Tile;
@@ -13,26 +14,28 @@ import tiles.Tile;
  * @author fawad
  */
 public class RegularPiece extends Piece {
+    
+    private static final Board board = new Board();
 
     public RegularPiece(Coordinates coordinates, Team team) {
         super(coordinates, team);
     }
 
     @Override
-    protected ArrayList<Coordinates> getDiagonalTiles() {
+    protected ArrayList<Coordinates> getDiagonalTiles(Coordinates initialCoordinates) {
         ArrayList<Coordinates> diagonals = new ArrayList();
 
         // Get diagonals for regular piece
         int frow;
 
         if (this.team == Team.WHITE) {
-            frow = this.coordinates.row + 1;
+            frow = initialCoordinates.row + 1;
         } else {
-            frow = this.coordinates.row - 1;
+            frow = initialCoordinates.row - 1;
         }
 
-        int fcol = this.coordinates.col - 1;
-        int scol = this.coordinates.col + 1;
+        int fcol = initialCoordinates.col - 1;
+        int scol = initialCoordinates.col + 1;
 
         Coordinates diagonal1 = new Coordinates(frow, fcol);
         Coordinates diagonal2 = new Coordinates(frow, scol);
@@ -71,22 +74,26 @@ public class RegularPiece extends Piece {
     }
 
     @Override
-    public void calculateLegalMoves(Tile[][] board, Coordinates initialPosition, boolean checkEmpty) {
-        ArrayList<Coordinates> diagonals = this.getDiagonalTiles();
-        System.out.println(diagonals);
-
+    public void calculateLegalMoves(Tile[][] gameBoard, Coordinates initialPosition, boolean checkEmpty) {        
+        // Calculate new legal moves
+        ArrayList<Coordinates> diagonals = this.getDiagonalTiles(initialPosition);
         for (Coordinates diagonal : diagonals) {
-            // If the diagonal is out of the game board, then ignore it
-            if (diagonal.row > 7
-                    || diagonal.row < 0
-                    || diagonal.col > 7
-                    || diagonal.col < 0) {
+            
+            // Validate  diagonal tile
+            if (this.isValidCoordinates(diagonal) == false) {
                 continue;
             }
 
             // If diagonal is empty, add it in legal moves
-            Tile cellAtDiagonal = board[diagonal.row][diagonal.col];
-            if (cellAtDiagonal.isEmpty()) {
+            // Here, checkEmpty is used to make sure that we don't add any
+            // empty tiles in legal moves when we are calculating legal moves 
+            // recursively, because it will be calculating moves which could only
+            // be made when a piece steps over its enemy piece and during this
+            // piece is not allowed to move to an empty tile which is diagonal to its
+            // current tile, instead it can only step over other enemy pieces if
+            // possible
+            Tile diagonalTile = board.getTile(diagonal);
+            if (diagonalTile.isEmpty()) {
                 if (checkEmpty) {
                     Move move = new Move(diagonal, this.coordinates);
                     legalMoves.add(move);
@@ -94,28 +101,24 @@ public class RegularPiece extends Piece {
                 continue;
             }
 
-            // If diagonal is not empty and contains piece of opposite color,
-            Piece pieceOnDiagonal = cellAtDiagonal.getPiece();
+            // If diagonal is not empty and contains an enemy piece, then get
+            // the tile next to current diagonal tile, if that next tile
+            // is empty then add it to legal moves because our piece can jump over
+            // the enemy piece
+            Piece pieceOnDiagonal = diagonalTile.getPiece();
 
-            if (pieceOnDiagonal.team != this.team) {
-                // Then get the diagonal next to current diagonal
-                Coordinates nextDiagonalCoordinates = this.getNextDiagonalTile(diagonal, initialPosition);
-                if (nextDiagonalCoordinates.row > 7
-                        || nextDiagonalCoordinates.row < 0
-                        || nextDiagonalCoordinates.col > 7
-                        || nextDiagonalCoordinates.col < 0) {
+            if (pieceOnDiagonal.isEnemyPiece(this.team)) {
+                Coordinates nextTileCoordinates = this.getNextDiagonalTile(diagonal, initialPosition);
+                if (this.isValidCoordinates(nextTileCoordinates) == false) {
                     continue;
                 }
-
-                // Check if this next diagonal is empty or not
-                Tile nextDiagonalCell = board[nextDiagonalCoordinates.row][nextDiagonalCoordinates.col];
-                String nextDiagonalPositionStr = nextDiagonalCoordinates.toString();
-                String initialPositionStr = initialPosition.toString();
-                if (nextDiagonalCell.isEmpty()
-                        && nextDiagonalPositionStr.equals(initialPositionStr) == false) {
-                    Move move = new Move(nextDiagonalCoordinates, initialPosition);
+                
+                Tile nextTile = board.getTile(nextTileCoordinates);
+                if (nextTile.isEmpty()
+                        && nextTile.matchCoordinates(initialPosition) == false) {
+                    Move move = new Move(nextTileCoordinates, initialPosition);
                     legalMoves.add(move);
-                    calculateLegalMoves(board, nextDiagonalCoordinates, false);
+                    calculateLegalMoves(gameBoard, nextTileCoordinates, false);
                 }
 
             }

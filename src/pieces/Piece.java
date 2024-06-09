@@ -25,10 +25,10 @@ public abstract class Piece {
 
     /**
      * Finds diagonal tiles of the piece w.r.t it's coordinates
-     *
+     * @param initialCoordinates
      * @return List of Coordinates(row, col)
      */
-    protected abstract ArrayList<Coordinates> getDiagonalTiles();
+    protected abstract ArrayList<Coordinates> getDiagonalTiles(Coordinates initialCoordinates);
 
     /**
      * Finds the next diagonal tile of currently given tile. It is used to get
@@ -64,5 +64,20 @@ public abstract class Piece {
 
     public Team getTeam() {
         return team;
+    }
+
+    protected boolean isValidCoordinates(Coordinates coordinates) {
+        if (coordinates.row > 7
+                || coordinates.row < 0
+                || coordinates.col > 7
+                || coordinates.col < 0) {
+            return false;
+        }
+
+        return true;
+    }
+    
+    protected boolean isEnemyPiece(Team pieceTeam) {
+        return this.team != pieceTeam;
     }
 }
