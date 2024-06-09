@@ -4,6 +4,7 @@
  */
 package board;
 
+import tiles.Colors;
 import pieces.Piece;
 import pieces.RegularPiece;
 import pieces.Team;

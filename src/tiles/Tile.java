@@ -4,7 +4,6 @@
  */
 package tiles;
 
-import board.Colors;
 import board.Coordinates;
 import pieces.Piece;
 
