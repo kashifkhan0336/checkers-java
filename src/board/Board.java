@@ -60,11 +60,16 @@ public class Board {
         return gameBoard[row][col];
     }
     
-    public void updateBoard(Move move) {
+    public Tile getTile(Coordinates coordinates) {
+        return gameBoard[coordinates.row][coordinates.col];
+    }
+    
+    public void makeMove(Move move) {
         Coordinates to = move.toTileCoordinates;
         Coordinates from = move.fromTileCoordinates;
         
+        Piece fromPiece = this.getTile(from.row, from.col).getPiece();
+        gameBoard[to.row][to.col] = new Tile(Colors.BLACK, to, new RegularPiece(to, fromPiece.getTeam()));
         gameBoard[from.row][from.col] = new Tile(Colors.BLACK, from, null);
-        gameBoard[to.row][to.col] = new Tile(Colors.BLACK, to, this.getTile(from.row, from.col).getPiece());
     }
 }
