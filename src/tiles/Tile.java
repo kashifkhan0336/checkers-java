@@ -38,5 +38,9 @@ public class Tile {
     public Coordinates getCoordinates() {
         return coordinates;
     }
+    
+    public boolean matchCoordinates(Coordinates coordinates) {
+        return this.coordinates.toString().equals(coordinates.toString());
+    }
 
 }
