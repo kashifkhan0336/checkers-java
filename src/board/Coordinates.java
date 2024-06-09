@@ -11,4 +11,11 @@ public class Coordinates {
         this.col = col;
     }
 
+    @Override
+    public String toString() {
+        return row + "x" + col;
+    }
+    
+    
+
 }
