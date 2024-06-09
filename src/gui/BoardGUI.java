@@ -3,6 +3,8 @@ package gui;
 import board.Board;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import javax.swing.JPanel;
 import pieces.Move;
@@ -42,12 +44,47 @@ public class BoardGUI {
         this.displayBoard();
     }
     
+    private void hidePreviousLegalMoves() {
+        for (Component component : boardPanel.getComponents()) {
+            if (component.getBackground().equals(Color.green)){
+                component.setBackground(Color.black);
+            }
+        }
+    }
+    
     public void displayLegalMoves(ArrayList<Move> legalMoves) {
+        this.hidePreviousLegalMoves();
+        
         for (Component component : boardPanel.getComponents()) {
             for (Move legalMove : legalMoves) {
                 TileGUI tileGui = (TileGUI) component;
                 if(tileGui.matchCoordinates(legalMove.toTileCoordinates)) {
                     tileGui.setBackground(Color.green);
+                    // add an event listener that updates the board state when
+                    // player makes a move
+                    tileGui.addMouseListener(new MouseListener() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            board.makeMove(legalMove);
+                            reRenderBoard();
+                        }
+
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                        }
+
+                        @Override
+                        public void mouseReleased(MouseEvent e) {
+                        }
+
+                        @Override
+                        public void mouseEntered(MouseEvent e) {
+                        }
+
+                        @Override
+                        public void mouseExited(MouseEvent e) {
+                        }
+                    });
                 }
             }
         }
