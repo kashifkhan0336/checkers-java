@@ -10,13 +10,13 @@ import board.Coordinates;
  *
  * @author fawad
  */
-class Move {
-    public Coordinates toTileCoordinate;
-    public Coordinates fromTileCoordinate;
+public class Move {
+    public Coordinates toTileCoordinates;
+    public Coordinates fromTileCoordinates;
 
-    public Move(Coordinates toTileCoordinate, Coordinates fromTileCoordinate) {
-        this.toTileCoordinate = toTileCoordinate;
-        this.fromTileCoordinate = fromTileCoordinate;
+    public Move(Coordinates toTileCoordinates, Coordinates fromTileCoordinates) {
+        this.toTileCoordinates = toTileCoordinates;
+        this.fromTileCoordinates = fromTileCoordinates;
     }
     
 }
