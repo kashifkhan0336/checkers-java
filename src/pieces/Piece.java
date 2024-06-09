@@ -16,7 +16,7 @@ public abstract class Piece {
 
     protected Coordinates coordinates;
     protected Team team;
-    protected ArrayList<Move> legalMoves;
+    protected ArrayList<Move> legalMoves = new ArrayList();
 
     public Piece(Coordinates coordinates, Team team) {
         this.coordinates = coordinates;
