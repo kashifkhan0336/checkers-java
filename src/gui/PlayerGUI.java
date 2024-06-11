@@ -7,6 +7,8 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
@@ -17,16 +19,13 @@ import player.Player;
  * @author fawad
  */
 public class PlayerGUI {
-    private final JPanel playersPanel;
-    private final Player p1 = new Player("Fawad");
-    private final Player p2 = new Player("Moiz");
-    
+    private final JPanel playersPanel;    
 
     public PlayerGUI(JPanel playersPanel) {
         this.playersPanel = playersPanel;
     }
     
-    public void displayPlayers() {
+    public void displayPlayers(Player p1, Player p2) {
         this.playersPanel.add(this.create(p1), BorderLayout.EAST);
         this.playersPanel.add(this.create(p2), BorderLayout.WEST);
         this.playersPanel.revalidate();
@@ -34,19 +33,22 @@ public class PlayerGUI {
     }
     
     private JPanel create(Player p) {
-        JPanel playerGui = new JPanel(new BorderLayout());
-        JLabel name = new JLabel();
-        JLabel score = new JLabel();
-        JLabel timer = new JLabel();
+        JPanel playerGui = new JPanel(new GridLayout(0,1));
+        JLabel nameLabel = new JLabel();
+        JLabel scoreLabel = new JLabel();
+        JLabel timerLabel = new JLabel();
+        JLabel teamLabel = new JLabel();
         
-        name.setText(p.getName());
-        score.setText("Score: " + String.valueOf(p.getScore()));
-        timer.setText("Timer: " + String.valueOf(30));
+        nameLabel.setText(p.getName());
+        scoreLabel.setText("Score: " + String.valueOf(p.getScore()));
+        timerLabel.setText("Timer: " + String.valueOf(30));
+        teamLabel.setText("Team: " +  p.getTeam());
         
         playerGui.setPreferredSize(new Dimension(100, 50));
-        playerGui.add(name, BorderLayout.NORTH);
-        playerGui.add(score, BorderLayout.WEST);
-        playerGui.add(timer, BorderLayout.SOUTH);
+        playerGui.add(nameLabel);
+        playerGui.add(teamLabel);
+        playerGui.add(timerLabel);
+        playerGui.add(scoreLabel);
         
         return playerGui;
     }
