@@ -4,13 +4,12 @@
  */
 package gui;
 
-import board.Board;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import pieces.Team;
 
 /**
  *
@@ -20,7 +19,7 @@ public class App {
     private final JFrame frame = new JFrame();
     private final JPanel boardPanel = new JPanel();
     private final JPanel playersPanel = new JPanel();
-    private final Board board = new Board();
+    private final Game gameHandler = new Game();
     
     private final BoardGUI boardGUI = new BoardGUI(boardPanel);
     private final PlayerGUI playerGUI = new PlayerGUI(playersPanel);
@@ -30,9 +29,10 @@ public class App {
         this.setupBoardPanel();
         this.setupPlayerPanel();
         
-        board.create();
-        boardGUI.displayBoard();
-        playerGUI.displayPlayers();
+        gameHandler.board.create();
+        boardGUI.displayBoard(gameHandler.board.getBoard());
+        playerGUI.displayPlayers(gameHandler.playerOne, gameHandler.playerTwo);
+        // Add event listeners on the pieces of the player who is gonna make move
     }
     
     private void createGameWindow() {
@@ -54,5 +54,16 @@ public class App {
         playersPanel.setLayout(new BorderLayout());
         playersPanel.setPreferredSize(new Dimension(480, 50));
         frame.add(playersPanel, BorderLayout.SOUTH);
+    }
+    
+    private void addClickListenersOnPieces() {
+        int turn = gameHandler.getTurn();
+        Team team;
+        if (turn == 1) {
+            team = gameHandler.playerOne.getTeam();
+        }
+        else {
+            team = gameHandler.playerTwo.getTeam();
+        }
     }
 }
