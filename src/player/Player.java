@@ -4,6 +4,8 @@
  */
 package player;
 
+import pieces.Team;
+
 /**
  *
  * @author fawad
@@ -11,9 +13,11 @@ package player;
 public class Player {
     private int score = 0;
     private final String name;
+    private final Team team;
 
-    public Player(String name) {
+    public Player(String name, Team team) {
         this.name = name;
+        this.team = team;
     }
 
     public int getScore() {
@@ -26,7 +30,10 @@ public class Player {
     
     public void increaseScore(int num) {
         this.score += num;
-    } 
-    
+    }
+
+    public Team getTeam() {
+        return team;
+    }
     
 }
