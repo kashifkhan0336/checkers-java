@@ -4,37 +4,44 @@
  */
 package gui;
 
+import board.Coordinates;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import pieces.Move;
+import pieces.Piece;
 import pieces.Team;
+import player.Player;
+import tiles.Tile;
 
 /**
  *
  * @author fawad
  */
 public class App {
+
     private final JFrame frame = new JFrame();
     private final JPanel boardPanel = new JPanel();
-    private final JPanel playersPanel = new JPanel();
     private final Game gameHandler = new Game();
-    
-    private final BoardGUI boardGUI = new BoardGUI(boardPanel);
-    private final PlayerGUI playerGUI = new PlayerGUI(playersPanel);
-    
+
     public void start() {
         this.createGameWindow();
-        this.setupBoardPanel();
-        this.setupPlayerPanel();
-        
-        gameHandler.board.create();
-        boardGUI.displayBoard(gameHandler.board.getBoard());
-        playerGUI.displayPlayers(gameHandler.playerOne, gameHandler.playerTwo);
-        // Add event listeners on the pieces of the player who is gonna make move
+        this.createBoardPanel();
+
+        this.gameHandler.board.create();
+        this.displayGameBoard();
     }
-    
+
     private void createGameWindow() {
         frame.setTitle("Checkers");
         frame.setSize(480, 600);
@@ -43,27 +50,138 @@ public class App {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
-    
-    private void setupBoardPanel() {
-        boardPanel.setLayout(new GridLayout(8,8));
-        boardPanel.setPreferredSize(new Dimension(480, 480));
-        frame.add(boardPanel, BorderLayout.NORTH);
+
+    private void createBoardPanel() {
+        boardPanel.setLayout(new GridLayout(8, 8));
+        boardPanel.setSize(480, 480);
+        frame.add(boardPanel);
     }
-    
-    private void setupPlayerPanel() {
-        playersPanel.setLayout(new BorderLayout());
-        playersPanel.setPreferredSize(new Dimension(480, 50));
-        frame.add(playersPanel, BorderLayout.SOUTH);
+
+    private void displayGameBoard() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Tile tile = this.gameHandler.board.getTile(i, j);
+                JPanel tileGUI = this.createTileGUI(tile);
+                this.boardPanel.add(tileGUI);
+            }
+        }
+
+        this.addClick();
+        this.boardPanel.revalidate();
+        this.boardPanel.repaint();
     }
-    
-    private void addClickListenersOnPieces() {
-        int turn = gameHandler.getTurn();
-        Team team;
-        if (turn == 1) {
-            team = gameHandler.playerOne.getTeam();
+
+    private JPanel createTileGUI(Tile tile) {
+        TileGUI tileGUI = new TileGUI(tile.getCoordinates());
+        tileGUI.setSize(60, 60);
+        switch (tile.getColor()) {
+            case WHITE ->
+                tileGUI.setBackground(Color.white);
+            case BLACK ->
+                tileGUI.setBackground(Color.black);
         }
-        else {
-            team = gameHandler.playerTwo.getTeam();
+
+        if (tile.isEmpty()) {
+            return tileGUI;
         }
+
+        // Create piece gui
+        tileGUI.add(this.createPieceGui(tile.getPiece()));
+        return tileGUI;
+    }
+
+    private JButton createPieceGui(Piece piece) {
+        JButton pieceGUI = new JButton();
+        pieceGUI.setPreferredSize(new Dimension(30, 30));
+        switch (piece.getTeam()) {
+            case RED ->
+                pieceGUI.setBackground(Color.red);
+            case WHITE ->
+                pieceGUI.setBackground(Color.white);
+        }
+        return pieceGUI;
+    }
+
+    private void addClick() {
+        for (Component component : this.boardPanel.getComponents()) {
+            TileGUI tileGUI = (TileGUI) component;
+            if (tileGUI.getComponentCount() < 1) {
+                continue;
+            }
+
+            JButton pieceGUI = (JButton) tileGUI.getComponent(0);
+            pieceGUI.addActionListener((ActionEvent e) -> {
+                this.hidePreviousLegalMoves();
+
+                Piece piece = this.gameHandler.board.getTile(tileGUI.getCoordinates()).getPiece();
+                piece.calculateLegalMoves(this.gameHandler.board.getBoard(), piece.getCoordinates(), true);
+                this.showLegalMoves(piece.getLegalMoves());
+            });
+        }
+    }
+
+    private void showLegalMoves(ArrayList<Move> legalMoves) {
+        for (Move legalMove : legalMoves) {
+            for (Component component : this.boardPanel.getComponents()) {
+                TileGUI tileGUI = (TileGUI) component;
+                if (tileGUI.matchCoordinates(legalMove.toTileCoordinates) == false) {
+                    continue;
+                }
+
+                tileGUI.setBackground(Color.green);
+                MouseListener m = this.addClickOnLegalMove(tileGUI, legalMove);
+                tileGUI.addMouseListener(m);
+            }
+        }
+
+        this.boardPanel.revalidate();
+        this.boardPanel.repaint();
+    }
+
+    private void hidePreviousLegalMoves() {
+        for (Component component : this.boardPanel.getComponents()) {
+            TileGUI tileGUI = (TileGUI) component;
+            if (tileGUI.getBackground() == Color.green) {
+                tileGUI.setBackground(Color.black);
+            }
+        }
+    }
+
+    private MouseListener addClickOnLegalMove(TileGUI tileGUI, Move legalMove) {
+        MouseListener m = new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (tileGUI.getBackground() != Color.green) {
+                    return;
+                }
+
+                // Make move
+                gameHandler.board.updateBoard(legalMove);
+                reRenderBoard();
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        };
+
+        return m;
+    }
+
+    private void reRenderBoard() {
+        this.boardPanel.removeAll();
+        this.displayGameBoard();
     }
 }

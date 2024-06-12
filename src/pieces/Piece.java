@@ -80,4 +80,8 @@ public abstract class Piece {
     protected boolean isEnemyPiece(Team pieceTeam) {
         return this.team != pieceTeam;
     }
+    
+    public boolean matchCoordinates(Coordinates c) {
+        return this.coordinates.toString().equals(c.toString());
+    }
 }

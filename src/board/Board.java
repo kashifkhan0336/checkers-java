@@ -64,7 +64,7 @@ public class Board {
         return gameBoard[coordinates.row][coordinates.col];
     }
     
-    public void makeMove(Move move) {
+    public void updateBoard(Move move) {
         Coordinates to = move.toTileCoordinates;
         Coordinates from = move.fromTileCoordinates;
         
