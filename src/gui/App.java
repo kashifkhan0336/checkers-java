@@ -110,10 +110,15 @@ public class App {
             }
 
             JButton pieceGUI = (JButton) tileGUI.getComponent(0);
+            Piece piece = this.gameHandler.board.getTile(tileGUI.getCoordinates()).getPiece();
+            
+            if (gameHandler.getTurn() != piece.getTeam()) {
+                continue;
+            }
+
             pieceGUI.addActionListener((ActionEvent e) -> {
                 this.hidePreviousLegalMoves();
-
-                Piece piece = this.gameHandler.board.getTile(tileGUI.getCoordinates()).getPiece();
+                piece.clearLegalMoves();
                 piece.calculateLegalMoves(this.gameHandler.board.getBoard(), piece.getCoordinates(), true);
                 this.showLegalMoves(piece.getLegalMoves());
             });
@@ -129,7 +134,7 @@ public class App {
                 }
 
                 tileGUI.setBackground(Color.green);
-                MouseListener m = this.addClickOnLegalMove(tileGUI, legalMove);
+                MouseListener m = this.addClickOnLegalMove(tileGUI, legalMove, legalMoves);
                 tileGUI.addMouseListener(m);
             }
         }
@@ -147,7 +152,7 @@ public class App {
         }
     }
 
-    private MouseListener addClickOnLegalMove(TileGUI tileGUI, Move legalMove) {
+    private MouseListener addClickOnLegalMove(TileGUI tileGUI, Move selectedMove, ArrayList<Move> legalMoves) {
         MouseListener m = new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -156,8 +161,13 @@ public class App {
                 }
 
                 // Make move
-                gameHandler.board.updateBoard(legalMove);
-                reRenderBoard();
+                ArrayList<Move> connectedMoves = gameHandler.getConnectedMoves(selectedMove, legalMoves);
+                gameHandler.switchTurn();
+                for (Move connectedMove : connectedMoves) {
+                    gameHandler.board.updateBoard(connectedMove);
+                    reRenderBoard();
+                }
+                
             }
 
             @Override

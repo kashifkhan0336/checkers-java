@@ -16,58 +16,77 @@ import tiles.Tile;
  * @author fawad
  */
 public class Board {
+
     private static final Tile[][] gameBoard = new Tile[8][8];
-    
+
     public void create() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                
+
                 Coordinates coordinates = new Coordinates(i, j);
-                
+
                 if ((i + j) % 2 == 0) {
                     // Create an empty white tile
                     gameBoard[i][j] = new Tile(Colors.WHITE, coordinates, null);
-                    
-                } else {                    
+
+                } else {
                     // Create white pieces for rows 0,1,2
                     if (i >= 0 && i <= 2) {
                         Piece whitePiece = new RegularPiece(coordinates, Team.WHITE);
                         gameBoard[i][j] = new Tile(Colors.BLACK, coordinates, whitePiece);
                         continue;
                     }
-                    
+
                     // Create red pieces for rows 5,6,7
                     if (i >= 5 && i <= 7) {
                         Piece redPiece = new RegularPiece(coordinates, Team.RED);
                         gameBoard[i][j] = new Tile(Colors.BLACK, coordinates, redPiece);
                         continue;
                     }
-                    
+
                     // Create empty black tiles for rest of the rows
                     Tile emptyBlackTile = new Tile(Colors.BLACK, coordinates, null);
                     gameBoard[i][j] = emptyBlackTile;
                 }
-                
+
             }
         }
     }
-    
+
     public Tile[][] getBoard() {
         return gameBoard;
     }
-    
+
     public Tile getTile(int row, int col) {
         return gameBoard[row][col];
     }
-    
+
     public Tile getTile(Coordinates coordinates) {
         return gameBoard[coordinates.row][coordinates.col];
     }
     
+    private Coordinates getStepOverTile(Coordinates to, Coordinates from) {
+        int row = from.row - 1;
+        int col;
+        if (to.col - from.col == 2) {
+            col = from.col + 1;
+        } else {
+            col = from.col - 1;
+        }
+
+        return new Coordinates(row, col);
+    }
+
     public void updateBoard(Move move) {
         Coordinates to = move.toTileCoordinates;
         Coordinates from = move.fromTileCoordinates;
-        
+
+        // Check if piece is stepping over it's enemy piece
+        if (to.row - from.row == 2 || to.row - from.row == -2) {
+            Coordinates s = this.getStepOverTile(to, from);
+            gameBoard[s.row][s.col] = new Tile(Colors.BLACK, from, null);
+        }
+
         Piece fromPiece = this.getTile(from.row, from.col).getPiece();
         gameBoard[to.row][to.col] = new Tile(Colors.BLACK, to, new RegularPiece(to, fromPiece.getTeam()));
         gameBoard[from.row][from.col] = new Tile(Colors.BLACK, from, null);
